@@ -1,5 +1,5 @@
 from langchain.tools import tool
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
 import subprocess
 import os
@@ -129,43 +129,109 @@ def execute_shell_command(command: str, working_directory: Optional[str] = None,
 
 class MonitorProcessInput(BaseModel):
     process_description: str = Field(description="Description of the process to monitor")
-    log_file: Optional[str] = Field(default=None, description="Path to log file to monitor")
+    log_file: Optional[str] = Field(default=None, description="Path to log file to parse for metrics")
     metrics_to_track: list[str] = Field(
-        default=["loss", "accuracy", "epoch"],
+        default=["loss", "accuracy", "val_loss", "val_accuracy", "epoch"],
         description="Metrics to track during training"
     )
-    
+    history_window: int = Field(
+        default=5,
+        description="Number of recent entries to use when detecting trends/stagnation"
+    )
+
+
 @tool(args_schema=MonitorProcessInput)
 def observe_training_process(
     process_description: str,
     log_file: Optional[str] = None,
-    metrics_to_track: list[str] = ["loss", "accuracy", "epoch"]
+    metrics_to_track: list[str] = ["loss", "accuracy", "val_loss", "val_accuracy", "epoch"],
+    history_window: int = 5,
 ) -> dict:
-    """
-    Monitors a running training process in real-time.
-    Tracks metrics like loss, accuracy, learning rate, and epoch progress.
-    
-    Can detect:
-    - Training stagnation (plateau in metrics)
-    - Overfitting (validation loss increasing while training loss decreases)
-    - Optimal stopping point
-    - Resource issues (OOM errors, GPU problems)
-    
-    Integrates with terminal observation for live feedback.
-    """
-    return {
+    """Parse training logs and surface current status, trends, and warnings."""
+    import json
+    import re
+    from collections import defaultdict, deque
+
+    result = {
         "process": process_description,
         "log_file": log_file,
-        "tracking": metrics_to_track,
-        "monitoring_capabilities": [
-            "Real-time metric extraction from logs",
-            "Automatic detection of training issues",
-            "Performance trend analysis",
-            "Early stopping recommendations",
-            "Resource usage monitoring"
-        ],
-        "note": "For real-time monitoring, redirect training output to a log file and use this tool to parse it periodically"
+        "metrics": {},
+        "trend_analysis": {},
+        "warnings": [],
     }
+
+    if not log_file:
+        result["note"] = "Provide a log_file path to enable parsing. Redirect your trainer output to a file."
+        return result
+
+    path = os.path.expanduser(log_file)
+    if not os.path.exists(path):
+        result["status"] = "error"
+        result["error"] = f"Log file not found: {log_file}"
+        return result
+
+    try:
+        # Read the tail of the file to keep memory usage low
+        with open(path, "r", encoding="utf-8", errors="ignore") as handle:
+            handle.seek(0, os.SEEK_END)
+            file_size = handle.tell()
+            handle.seek(max(file_size - 10_000, 0))
+            tail = handle.read()
+    except Exception as exc:  # pragma: no cover - defensive
+        result["status"] = "error"
+        result["error"] = str(exc)
+        return result
+
+    metric_pattern = re.compile(r"(?P<metric>\b[a-zA-Z_]+\b)\s*[=:]\s*(?P<value>-?\d+\.\d+|-?\d+)")
+    history: dict[str, deque] = defaultdict(lambda: deque(maxlen=history_window))
+    extracted_lines: List[str] = []
+
+    for line in tail.splitlines():
+        matches = metric_pattern.findall(line)
+        if not matches:
+            continue
+        line_metrics = {}
+        for metric, value in matches:
+            if metric in metrics_to_track:
+                numeric_value = float(value)
+                history[metric].append(numeric_value)
+                line_metrics[metric] = numeric_value
+        if line_metrics:
+            extracted_lines.append(json.dumps(line_metrics))
+
+    result["metrics"] = {metric: list(values) for metric, values in history.items()}
+    result["recent_entries"] = extracted_lines[-history_window:]
+
+    # Trend analysis
+    for metric, values in history.items():
+        if len(values) < 2:
+            continue
+        delta = values[-1] - values[0]
+        if metric.lower().startswith("val") or metric.lower().endswith("loss"):
+            if abs(delta) < 1e-3:
+                result["trend_analysis"][metric] = "Plateau detected"
+            elif delta > 0:
+                result["trend_analysis"][metric] = "Trending upward (possible degradation)"
+            else:
+                result["trend_analysis"][metric] = "Improving"
+        else:
+            if abs(delta) < 1e-3:
+                result["trend_analysis"][metric] = "Flat trend"
+            elif delta > 0:
+                result["trend_analysis"][metric] = "Trending upward"
+            else:
+                result["trend_analysis"][metric] = "Trending downward"
+
+    # Simple warnings
+    if "loss" in history and "val_loss" in history:
+        if history["val_loss"] and history["loss"] and history["val_loss"][-1] > history["loss"][-1] * 1.2:
+            result["warnings"].append("Validation loss notably higher than training loss (possible overfitting)")
+    if "accuracy" in history and "val_accuracy" in history:
+        if history["val_accuracy"] and history["accuracy"] and history["val_accuracy"][-1] < history["accuracy"][-1] * 0.8:
+            result["warnings"].append("Validation accuracy significantly below training accuracy")
+
+    result["status"] = "success"
+    return result
 
 
 class CheckSystemResourcesInput(BaseModel):

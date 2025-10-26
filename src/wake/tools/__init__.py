@@ -1,4 +1,4 @@
-from typing_extensions import Callable
+from typing import Callable
 
 from wake.tools.data_tools import (
     load_dataset,
