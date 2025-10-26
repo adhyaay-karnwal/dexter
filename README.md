@@ -1,38 +1,35 @@
-# Dexter 🤖
+# Wake 🤖
 
-Dexter is an autonomous financial research agent that thinks, plans, and learns as it works. It performs analysis using task planning, self-reflection, and real-time market data. Think Claude Code, but built specifically for financial research.
-
-
-<img width="979" height="651" alt="Screenshot 2025-10-14 at 6 12 35 PM" src="https://github.com/user-attachments/assets/5a2859d4-53cf-4638-998a-15cef3c98038" />
+Wake is an autonomous machine learning research and engineering agent that plans, executes, and optimizes end-to-end ML workflows. Built with a modular architecture, Wake combines task planning, self-validation, and comprehensive ML tooling to act as your autonomous ML engineer.
 
 ## Overview
 
-Dexter takes complex financial questions and turns them into clear, step-by-step research plans. It runs those tasks using live market data, checks its own work, and refines the results until it has a confident, data-backed answer.  
+Wake takes complex machine learning questions and challenges, breaking them down into clear, actionable task plans. It executes those tasks using a rich toolkit for data handling, model training, evaluation, and optimization—checking its own work and iterating until the job is done.
 
-It’s not just another chatbot.  It’s an agent that plans ahead, verifies its progress, and keeps iterating until the job is done.
+It's not just another chatbot. It's an agent that plans ahead, validates progress, and keeps iterating with ML best practices.
 
 **Key Capabilities:**
-- **Intelligent Task Planning**: Automatically decomposes complex queries into structured research steps
-- **Autonomous Execution**: Selects and executes the right tools to gather financial data
-- **Self-Validation**: Checks its own work and iterates until tasks are complete
-- **Real-Time Financial Data**: Access to income statements, balance sheets, and cash flow statements
-- **Safety Features**: Built-in loop detection and step limits to prevent runaway execution
+- **Intelligent Task Planning**: Automatically decomposes ML workflows into structured, sequential steps
+- **Autonomous Execution**: Selects and uses the right tools for data loading, training, evaluation, and more
+- **Self-Validation**: Checks its own work and iterates until objectives are met
+- **Comprehensive ML Toolkit**: Data processing, model training, neural networks, visualization, research tools
+- **Real-Time Monitoring**: Observe training processes, detect issues, and optimize on-the-fly
+- **Safety Features**: Loop detection, step limits, and resource management to prevent runaway execution
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/virattt?style=social)](https://twitter.com/virattt)
 
-### Prerequisites
+## Prerequisites
 
 - Python 3.10 or higher
 - [uv](https://github.com/astral-sh/uv) package manager
 - OpenAI API key (get [here](https://platform.openai.com/api-keys))
-- Financial Datasets API key (get [here](https://financialdatasets.ai))
 
-### Installation
+## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/virattt/dexter.git
-cd dexter
+git clone https://github.com/virattt/wake.git
+cd wake
 ```
 
 2. Install dependencies with uv:
@@ -45,69 +42,157 @@ uv sync
 # Copy the example environment file
 cp env.example .env
 
-# Edit .env and add your API keys
+# Edit .env and add your API key
 # OPENAI_API_KEY=your-openai-api-key
-# FINANCIAL_DATASETS_API_KEY=your-financial-datasets-api-key
 ```
 
-### Usage
+## Usage
 
-Run Dexter in interactive mode:
+Run Wake in interactive mode:
 ```bash
-uv run dexter-agent
+uv run wake-agent
 ```
 
-### Example Queries
+## Example Queries
 
-Try asking Dexter questions like:
-- "What was Apple's revenue growth over the last 4 quarters?"
-- "Compare Microsoft and Google's operating margins for 2023"
-- "Analyze Tesla's cash flow trends over the past year"
-- "What is Amazon's debt-to-equity ratio based on recent financials?"
+Try asking Wake questions like:
+- "Load the iris dataset and train a random forest classifier"
+- "Analyze the MNIST dataset and build a CNN for digit classification"
+- "Compare XGBoost and Random Forest performance on the wine quality dataset"
+- "Tune hyperparameters for a neural network on my custom dataset.csv"
+- "Visualize the correlation matrix for the Boston housing dataset"
+- "Search for papers on transformer architectures for time series"
 
-Dexter will automatically:
-1. Break down your question into research tasks
-2. Fetch the necessary financial data
-3. Perform calculations and analysis
-4. Provide a comprehensive, data-rich answer
+Wake will automatically:
+1. Break down your request into ML workflow tasks
+2. Load and analyze datasets
+3. Preprocess and clean data
+4. Train and evaluate models
+5. Generate visualizations and reports
+6. Provide comprehensive, metric-driven answers
 
 ## Architecture
 
-Dexter uses a multi-agent architecture with specialized components:
+Wake uses a multi-agent architecture with specialized components:
 
-- **Planning Agent**: Analyzes queries and creates structured task lists
-- **Action Agent**: Selects appropriate tools and executes research steps
-- **Validation Agent**: Verifies task completion and data sufficiency
-- **Answer Agent**: Synthesizes findings into comprehensive responses
+- **Planning Agent**: Analyzes ML queries and creates structured task sequences
+- **Action Agent**: Selects appropriate tools and executes ML operations
+- **Validation Agent**: Verifies task completion and ensures objectives are met
+- **Answer Agent**: Synthesizes findings into comprehensive, actionable responses
+
+## Tool Categories
+
+Wake has access to a comprehensive ML toolkit organized into categories:
+
+### Data Operations
+- Load datasets (CSV, JSON, Excel, Parquet)
+- Compute statistics and analyze distributions
+- Classify dataset types (classification, regression, etc.)
+- Clean data (handle missing values, outliers, normalization)
+
+### ML Operations
+- Train models (classification, regression, clustering, neural networks)
+- Hyperparameter tuning (grid search, random search, Bayesian optimization)
+- Model evaluation (metrics, confusion matrices, performance analysis)
+- Build and train neural networks (MLP, CNN, RNN, LSTM)
+- Feature engineering (polynomial features, PCA, feature selection)
+
+### Execution & System
+- Execute Python code for custom analysis
+- Run shell commands
+- Monitor training processes in real-time
+- Check system resources (CPU, GPU, memory)
+- Install Python packages on-the-fly
+
+### File Operations
+- Read files (text, JSON, YAML, scripts)
+- Write results and reports
+- Append to logs
+- List and explore directories
+
+### Research
+- Web search for papers, datasets, tutorials
+- Fetch documentation from URLs
+- Download datasets (Kaggle, HuggingFace, sklearn, TensorFlow)
+- Get ML library information and examples
+
+### Visualization
+- Create plots (line, scatter, histogram, heatmap, confusion matrix, ROC curves)
+- Plot training history
+- Generate reports with visualizations
 
 ## Project Structure
 
 ```
-dexter/
+wake/
 ├── src/
-│   ├── dexter/
-│   │   ├── agent.py      # Main agent orchestration logic
-│   │   ├── model.py      # LLM interface
-│   │   ├── tools.py      # Financial data tools
-│   │   ├── prompts.py    # System prompts for each component
-│   │   ├── schemas.py    # Pydantic models
-│   │   ├── utils/        # Utility functions
-│   │   └── cli.py        # CLI entry point
+│   └── wake/
+│       ├── agent.py          # Main agent orchestration logic
+│       ├── model.py           # LLM interface
+│       ├── prompts.py         # System prompts (planning, action, validation, answer)
+│       ├── schemas.py         # Pydantic models
+│       ├── cli.py             # CLI entry point
+│       ├── tools/             # ML toolkit
+│       │   ├── data_tools.py
+│       │   ├── ml_tools.py
+│       │   ├── file_tools.py
+│       │   ├── terminal_tools.py
+│       │   ├── research_tools.py
+│       │   ├── visualization_tools.py
+│       │   └── observe_integration.py
+│       └── utils/             # Utility functions
+│           ├── logger.py
+│           ├── ui.py
+│           └── intro.py
 ├── pyproject.toml
 └── uv.lock
 ```
 
 ## Configuration
 
-Dexter supports configuration via the `Agent` class initialization:
+Wake supports configuration via the `Agent` class initialization:
 
 ```python
-from dexter.agent import Agent
+from wake.agent import Agent
 
 agent = Agent(
     max_steps=20,              # Global safety limit
     max_steps_per_task=5       # Per-task iteration limit
 )
+```
+
+## Use Cases
+
+Wake is designed for:
+
+1. **ML Experimentation**: Quickly test different algorithms on datasets
+2. **Model Training**: Autonomous training with hyperparameter optimization
+3. **Data Analysis**: Exploratory data analysis with automatic insights
+4. **Research**: Find papers, datasets, and best practices
+5. **Model Evaluation**: Comprehensive performance analysis with visualizations
+6. **Learning**: Understand ML concepts through hands-on experimentation
+7. **Prototyping**: Rapidly prototype ML solutions
+
+## Advanced Features
+
+### Real-Time Training Observation
+Wake can monitor training processes in real-time, detecting:
+- Training stagnation (plateau in metrics)
+- Overfitting (validation loss diverging from training loss)
+- Optimal stopping points
+- Resource issues (OOM errors, GPU problems)
+
+### Autonomous Optimization
+Wake can autonomously:
+- Adjust hyperparameters based on performance
+- Suggest architecture modifications
+- Recommend preprocessing steps
+- Identify and fix common issues
+
+### Multi-Step Workflows
+Wake chains operations intelligently:
+```
+Query → Load Data → Analyze → Clean → Train → Evaluate → Report
 ```
 
 ## How to Contribute
@@ -118,10 +203,22 @@ agent = Agent(
 4. Push to the branch
 5. Create a Pull Request
 
-**Important**: Please keep your pull requests small and focused.  This will make it easier to review and merge.
+**Important**: Please keep your pull requests small and focused. This will make it easier to review and merge.
 
+## Roadmap
+
+- [ ] Integration with Weights & Biases for experiment tracking
+- [ ] Support for LLM fine-tuning workflows
+- [ ] Automated feature engineering pipelines
+- [ ] Multi-modal learning support (vision + text)
+- [ ] Distributed training capabilities
+- [ ] Model deployment tools
+- [ ] Custom plugin system for domain-specific tools
 
 ## License
 
 This project is licensed under the MIT License.
 
+---
+
+**Wake** — Your Autonomous ML Research Engineer

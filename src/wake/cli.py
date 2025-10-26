@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from dexter.agent import Agent
-from dexter.utils.intro import print_intro
+from wake.agent import Agent
+from wake.utils.intro import print_intro
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import InMemoryHistory
 
