@@ -2,18 +2,18 @@ from typing import List
 
 from langchain_core.messages import AIMessage
 
-from dexter.model import call_llm
-from dexter.prompts import (
+from wake.model import call_llm
+from wake.prompts import (
     ACTION_SYSTEM_PROMPT,
     get_answer_system_prompt,
     PLANNING_SYSTEM_PROMPT,
     get_tool_args_system_prompt,
     VALIDATION_SYSTEM_PROMPT,
 )
-from dexter.schemas import Answer, IsDone, OptimizedToolArgs, Task, TaskList
-from dexter.tools import TOOLS
-from dexter.utils.logger import Logger
-from dexter.utils.ui import show_progress
+from wake.schemas import Answer, IsDone, OptimizedToolArgs, Task, TaskList
+from wake.tools import TOOLS
+from wake.utils.logger import Logger
+from wake.utils.ui import show_progress
 
 
 class Agent:
